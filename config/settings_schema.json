@@ -1465,5 +1465,31 @@
         "default": "background-1"
       }
     ]
+  },
+  {
+    "name": "Icon Top Corner",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "icon_top_corner",
+        "label": "Icon top corner"
+      },
+      {
+        "type": "text",
+        "id": "icon_corner_alt",
+        "label": "Icon top corner",
+        "default": "hihihi"
+      },
+      {
+        "type": "range",
+        "id": "icon_corner_width",
+        "min": 50,
+        "max": 300,
+        "step": 10,
+        "default": 100,
+        "unit": "px",
+        "label": "icon width setting"
+      }
+    ]
   }
 ]

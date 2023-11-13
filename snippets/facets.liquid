@@ -111,6 +111,141 @@
 
             <script src="{{ 'show-more.js' | asset_url }}" defer="defer"></script>
             {% comment %} Filters for both horizontal and vertical filter {% endcomment %}
+
+            {% comment %} tag filter {% endcomment %}
+            {% if collection.tags.size > 0 %}
+              {% liquid
+                assign total_active_values = total_active_values | plus: collection.tags.size
+                assign has_visual_display = false
+                assign visual_layout_class = 'facets-layout-list'
+                assign show_more_number = 10
+              %}
+
+              <details
+                id="Details-{{ forloop.index }}-{{ section.id }}"
+                class="{% if filter_type == 'horizontal' %}disclosure-has-popup facets__disclosure{% else %} facets__disclosure-vertical{% endif %} js-filter"
+                data-index="{{ forloop.index }}"
+                {% if filter_type == 'vertical' and forloop.index == 1 %}
+                  open
+                {% endif %}
+              >
+                <summary
+                  class="facets__summary caption-large focus-offset"
+                  aria-label="tags"
+                >
+                  <div>
+                    <span class="facets__summary-label">
+                      Tags
+                      {%- if filter_type == 'vertical' -%}
+                        <span class="facets__selected no-js-hidden{% if collection.tags.size == 0 %} hidden{% endif %}">
+                          ({{ collection.tags.size }})</span
+                        >
+                      {%- endif -%}
+                    </span>
+                    {%- if filter_type == 'vertical' -%}
+                      <span class="facets__and-helptext">
+                        {{ 'products.facets.filter_and_operator_subtitle' | t }}
+                      </span>
+                    {%- endif -%}
+                    {% render 'icon-caret' %}
+                  </div>
+                </summary>
+
+                <div
+                  id="Facet-{{ forloop.index }}-{{ section.id }}"
+                  class="parent-display {% if filter_type == 'horizontal' %}facets__display{% else %}facets__display-vertical{% endif %}"
+                >
+                  {%- if filter_type != 'vertical' -%}
+                    <div class="facets__header">
+                      <div>
+                        <span class="facets__selected no-js-hidden">
+                          {{- 'products.facets.filters_selected' | t: count: collection.tags.size -}}
+                        </span>
+                      </div>
+                      <facet-remove>
+                        {{ 'products.facets.reset' | t }}
+                      </facet-remove>
+                    </div>
+                  {%- endif -%}
+                  <fieldset class="facets-wrap parent-wrap {% if filter_type == 'vertical' %} facets-wrap-vertical{% endif %}">
+                    <legend class="visually-hidden">{{ tag | escape }}</legend>
+                    <ul
+                      class="{{ visual_layout_class }}{% if filter_type == 'vertical' %} facets__list--vertical{% else %} facets__list{% endif %} list-unstyled no-js-hidden"
+                      role="list"
+                    >
+                      {%- liquid
+                        assign sorted_values = filter.values
+                        # Keep the selected values grouped together when operator is AND
+                        if filter.operator == 'AND'
+                          assign active_filter_values = filter.values | where: 'active', true
+                          assign inactive_filter_values = filter.values | where: 'active', false
+                          assign sorted_values = active_filter_values | concat: inactive_filter_values
+                        endif
+                      -%}
+                      {% liquid
+                        assign is_disabled = false
+                      %}
+
+                      {% for tag in collection.tags %}
+                        <li class="list-menu__item facets__item{% if forloop.index > show_more_number and filter_type == 'vertical' %} show-more-item hidden{% endif %}">
+                          <label
+                            for="Filter-{{ tag | escape }}-{{ forloop.index }}"
+                            class="facets__label facet-checkbox{% if is_disabled %} facet-checkbox--disabled disabled{% endif %}{% if has_visual_display %} visual-display-parent visual-display-parent--{{ filter.presentation }}{% endif %}{% if value.active %} active{% endif %}"
+                          >
+                            <input
+                              type="checkbox"
+                              name="{{ tag }}"
+                              value="{{ tag }}"
+                              id="Filter-{{ tag | escape }}-{{ forloop.index }}"
+                            >
+
+                            {% if has_visual_display %}
+                              <div class="facets__visual-display-wrapper">
+                                {% render 'visual-display',
+                                  type: value.display.type,
+                                  value: value.display.value,
+                                  presentation: filter.presentation
+                                %}
+                              </div>
+                            {% else %}
+                              <svg
+                                width="1.6rem"
+                                height="1.6rem"
+                                viewBox="0 0 16 16"
+                                aria-hidden="true"
+                                focusable="false"
+                              >
+                                <rect width="16" height="16" stroke="currentColor" fill="none" stroke-width="1"></rect>
+                              </svg>
+
+                              <svg
+                                aria-hidden="true"
+                                class="icon icon-checkmark"
+                                width="1.1rem"
+                                height="0.7rem"
+                                viewBox="0 0 11 7"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path d="M1.5 3.5L2.83333 4.75L4.16667 6L9.5 1"
+                                  stroke="currentColor"
+                                  stroke-width="1.75"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round" />
+                              </svg>
+                            {% endif %}
+
+                            <span class="facet-checkbox__text" aria-hidden="true">{{- tag | escape }} 555</span>
+                          </label>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                    {% comment %} No show more for no JS {% endcomment %}
+                  </fieldset>
+                </div>
+              </details>
+            {% endif %}
+
             {%- for filter in results.filters -%}
               {% liquid
                 assign total_active_values = total_active_values | plus: filter.active_values.size

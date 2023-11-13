@@ -74,6 +74,17 @@
         class="product__info-container{% if section.settings.enable_sticky_info %} product__column-sticky{% endif %}"
       >
         {%- assign product_form_id = 'product-form-' | append: section.id -%}
+        
+        {%- if product.metafields.custom.linked_product != blank -%}
+          {% comment %} {{ product.metafields.custom.linked_product.value | json }} {% endcomment %}
+          <form method="post" action="/cart/add" data-product-form>
+            <input type="hidden" name="items[0]id" value="{{ product.metafields.custom.linked_product.value.variants.first.id }}" />
+            <input min="1" type="hidden" name="items[0]quantity" value="1"/>
+            <input type="hidden" name="items[1]id" value="{{ product.variants.first.id }}" />
+            <input min="1" type="hidden" name="items[1]quantity" value="1"/>
+            <input type="submit" value="Buy one Get one" class="btn" />
+          </form>
+        {%- endif -%}
 
         {%- for block in section.blocks -%}
           {%- case block.type -%}

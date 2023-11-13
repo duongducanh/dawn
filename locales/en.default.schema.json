@@ -663,8 +663,10 @@
     },
     "contact-form": {
       "name": "Contact Form",
+      "name-2": "Contact Form section 2 3",
       "presets": {
-        "name": "Contact form"
+        "name": "Contact form",
+        "name-2": "Contact form section 2 4"
       }
     },
     "custom-liquid": {
